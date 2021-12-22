@@ -85,14 +85,14 @@ func hashFromLSRemote(owner string, repo string, branch string) (string, error) 
 	return hash, nil
 }
 
-func generateImage(owner string, repo string, branch string, size int) (*gg.Context, error) {
+func generateImage(owner string, repo string, branch string, size int) (*gg.Context, string, error) {
 	if size >= MAX_SIZE {
 		size = MAX_SIZE
 	}
 
 	hash, err := hashFromLSRemote(owner, repo, branch)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 	hashBinary := stringToBinary(hash)
 	acrossBinary := hashBinary[:size]
@@ -111,7 +111,7 @@ func generateImage(owner string, repo string, branch string, size int) (*gg.Cont
 
 	h.Draw()
 
-	return h.Canvas, nil
+	return h.Canvas, hash, nil
 }
 
 func handler(w http.ResponseWriter, req *http.Request) {
@@ -122,11 +122,15 @@ func handler(w http.ResponseWriter, req *http.Request) {
 	}
 
 	size, _ := strconv.Atoi(req.URL.Query().Get("size"))
-	canvas, err := generateImage(req.URL.Query().Get("owner"), req.URL.Query().Get("repo"), req.URL.Query().Get("branch"), size)
+	canvas, hash, err := generateImage(req.URL.Query().Get("owner"), req.URL.Query().Get("repo"), req.URL.Query().Get("branch"), size)
 	if err != nil {
 		fmt.Fprintln(w, err)
 		return
 	}
+
+	w.Header().Set("Content-Type", "image/png")
+	w.Header().Set("Cache-Control", "no-cache")
+	w.Header().Set("ETag", hash)
 
 	err = png.Encode(w, canvas.Image())
 	if err != nil {
