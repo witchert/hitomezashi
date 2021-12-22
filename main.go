@@ -7,6 +7,7 @@ import (
 	"image/png"
 	"math/rand"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 
@@ -15,6 +16,7 @@ import (
 	"github.com/go-git/go-git/v5/config"
 	"github.com/go-git/go-git/v5/storage/memory"
 	"github.com/muesli/gamut"
+	"github.com/newrelic/go-agent/v3/newrelic"
 
 	"github.com/witchert/hitomezashi/hitomezashi"
 )
@@ -133,6 +135,18 @@ func handler(w http.ResponseWriter, req *http.Request) {
 }
 
 func main() {
-	http.HandleFunc("/", handler)
+	newrelicAppName := os.Getenv("NEWRELIC_APP_NAME")
+	newrelicLicense := os.Getenv("NEWRELIC_LICENSE")
+	if newrelicAppName != "" && newrelicLicense != "" {
+		app, _ := newrelic.NewApplication(
+			newrelic.ConfigAppName(newrelicAppName),
+			newrelic.ConfigLicense(newrelicLicense),
+			newrelic.ConfigDistributedTracerEnabled(true),
+		)
+
+		http.HandleFunc(newrelic.WrapHandleFunc(app, "/", handler))
+	} else {
+		http.HandleFunc("/", handler)
+	}
 	http.ListenAndServe(":1111", nil)
 }
