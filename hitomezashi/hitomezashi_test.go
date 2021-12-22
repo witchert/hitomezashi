@@ -6,6 +6,10 @@ import (
 
 func Benchmark(b *testing.B) {
 	for i := 0; i < b.N; i++ {
-		New([]string{"0", "1"}, []string{"1", "0"}, 24)
+		New(
+			[]bool{true, true, false, false, true, true, true, true, false, false, true, true, false, true, true, false, false, true, false, false, true, true, true, false},
+			[]bool{true, true, false, false, true, true, true, true, false, false, true, true, false, true, true, false, false, true, false, false, true, true, true, false},
+			24,
+		)
 	}
 }

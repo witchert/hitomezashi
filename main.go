@@ -9,7 +9,6 @@ import (
 	"net/http"
 	"os"
 	"strconv"
-	"strings"
 
 	"github.com/fogleman/gg"
 	"github.com/go-git/go-git/v5"
@@ -59,12 +58,18 @@ var colors = []color.Color{
 }
 
 // Convert a given string to binary representation for each rune
-func stringToBinary(str string) string {
+func stringToBinary(str string) []bool {
 	var buffer bytes.Buffer
 	for _, runeValue := range str {
 		fmt.Fprintf(&buffer, "%b", runeValue)
 	}
-	return fmt.Sprintf("%s", buffer.Bytes())
+	binaryString := fmt.Sprintf("%s", buffer.Bytes())
+	var out []bool
+	for _, x := range binaryString {
+		b, _ := strconv.ParseBool(string(x))
+		out = append(out, b)
+	}
+	return out
 }
 
 // Get commit hash from remote github repository
@@ -98,10 +103,7 @@ func generateImage(owner string, repo string, branch string, size int) (*gg.Cont
 	acrossBinary := hashBinary[:size]
 	downBinary := hashBinary[len(hashBinary)-(size):]
 
-	across := strings.Split(acrossBinary, "")
-	down := strings.Split(downBinary, "")
-
-	h := hitomezashi.New(across, down, 12)
+	h := hitomezashi.New(acrossBinary, downBinary, 12)
 
 	seed, _ := strconv.ParseInt(hash[:7], 16, 64)
 	r := rand.New(rand.NewSource(seed))
