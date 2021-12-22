@@ -1,8 +1,4 @@
 FROM golang:1.16
-# ENV CGO_ENABLED=0
-# ENV GO111MODULE=on
-# ENV GOOS=linux
-# ENV GOARCH=x86_64
 
 WORKDIR /app
 
