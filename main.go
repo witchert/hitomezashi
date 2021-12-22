@@ -123,10 +123,28 @@ func handler(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	size, _ := strconv.Atoi(req.URL.Query().Get("size"))
+	var err error
+	size := 24
+
+	if req.URL.Query().Get("size") != "" {
+		size, err = strconv.Atoi(req.URL.Query().Get("size"))
+		if err != nil {
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte("400 - Invalid size parameter!"))
+			return
+		}
+	}
+
+	if req.URL.Query().Get("owner") == "" || req.URL.Query().Get("repo") == "" || req.URL.Query().Get("branch") == "" {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("400 - Missing required parameters!"))
+		return
+	}
+
 	canvas, hash, err := generateImage(req.URL.Query().Get("owner"), req.URL.Query().Get("repo"), req.URL.Query().Get("branch"), size)
 	if err != nil {
-		fmt.Fprintln(w, err)
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("500 - " + err.Error()))
 		return
 	}
 
@@ -136,7 +154,8 @@ func handler(w http.ResponseWriter, req *http.Request) {
 
 	err = png.Encode(w, canvas.Image())
 	if err != nil {
-		fmt.Fprintln(w, err)
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("500 - " + err.Error()))
 	}
 }
 
