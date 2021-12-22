@@ -151,18 +151,19 @@ func (cell *Cell) setCellColor(position int, h *Hitomezashi) {
 	if position > 0 {
 		// Starting cell in a row, use color from row above
 		if position%h.width == 0 {
-			// is our cell top bound, if so use opposite color
 			if cell.topBound {
+				// the cell is top bound, use opposite color to the cell above
 				cell.colorChoice = ^h.cells[position-h.width].colorChoice
-				// our cell isnt top bound so match the cell aboves color
 			} else {
+				// the cell is not top bound, use same color as the cell above
 				cell.colorChoice = h.cells[position-h.width].colorChoice
 			}
-			// otherwise look to the previous cell to see if its right bound
 		} else if h.cells[position-1].rightBound {
+			// the cell is not the starting cell and the previous cell is right bound
+			// use opposote color to the previous cell
 			cell.colorChoice = ^h.cells[position-1].colorChoice
-			// previous cell isnt bound so match its color
 		} else {
+			// not bound above or by previous cell, use same color as the previous cell
 			cell.colorChoice = h.cells[position-1].colorChoice
 		}
 	}
