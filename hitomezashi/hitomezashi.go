@@ -69,7 +69,7 @@ func (h *Hitomezashi) Draw() {
 }
 
 func (h *Hitomezashi) drawCanvas() {
-	h.Canvas.SetHexColor("#ffffff")
+	h.Canvas.SetColor(color.White)
 	h.Canvas.Clear()
 }
 
@@ -86,12 +86,18 @@ func (h *Hitomezashi) setupCells() {
 	}
 }
 
+func (h *Hitomezashi) positionToCoords(position int) (int, int) {
+	col := position % h.width
+	row := position / h.width
+	x := col*h.scale + (h.borderWidth / 2)
+	y := row*h.scale + (h.borderWidth / 2)
+
+	return x, y
+}
+
 func (h *Hitomezashi) fillCells() {
 	for index, cell := range h.cells {
-		col := index % h.width
-		row := index / h.width
-		x := col*h.scale + (h.borderWidth / 2)
-		y := row*h.scale + (h.borderWidth / 2)
+		x, y := h.positionToCoords(index)
 
 		h.Canvas.SetColor(h.getColorFromChoice(cell.colorChoice))
 		h.Canvas.DrawRectangle(float64(x), float64(y), float64(h.scale), float64(h.scale))
@@ -105,10 +111,7 @@ func (h *Hitomezashi) drawLines() {
 
 	for index, cell := range h.cells {
 		if cell.topBound || cell.rightBound {
-			col := index % h.width
-			row := index / h.width
-			x := col*h.scale + (h.borderWidth / 2)
-			y := row*h.scale + (h.borderWidth / 2)
+			x, y := h.positionToCoords(index)
 
 			h.Canvas.SetRGB(0, 0, 0)
 
