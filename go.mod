@@ -9,6 +9,6 @@ require (
 	github.com/muesli/gamut v0.2.0
 	github.com/newrelic/go-agent/v3 v3.15.2
 	github.com/sergi/go-diff v1.2.0 // indirect
-	golang.org/x/crypto v0.0.0-20211215153901-e495a2d5b3d3 // indirect
+	golang.org/x/crypto v0.1.0 // indirect
 	golang.org/x/image v0.0.0-20211028202545-6944b10bf410 // indirect
 )
